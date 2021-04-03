@@ -32,12 +32,16 @@ export default function useRender(props: RenderProps) {
   const rowCount = renderElements.length + (infiniteScrollOption?.hasMore ? 1 : 0);
 
   const handleIsRowLoaded = ({ index }: { index: number }) => {
-    return !infiniteScrollOption?.hasMore || index < renderElements.length;
+    return !infiniteScrollOption?.hasMore || (
+      infiniteScrollOption?.scrollReverse
+        ? index > 0
+        : index < renderElements.length
+      );
   };
 
   const renderRow: ListRowRenderer = params => {
     const data: RenderElement = handleIsRowLoaded(params)
-      ? renderElements[params.index]
+      ? renderElements[params.index + (infiniteScrollOption?.scrollReverse ? 1 : 0)]
       : {
           key: 'loader',
           component: <>{infiniteScrollOption?.loader}</>

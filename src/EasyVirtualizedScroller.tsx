@@ -12,6 +12,7 @@ type Props = {
   useParentScrollElement?: boolean;
   overscanRowCount?: number;
   onLoadMore?: () => Promise<void>;
+  scrollReverse?: boolean;
   hasMore?: boolean;
   loader?: React.ReactElement;
 };
@@ -20,7 +21,7 @@ export type EasyVirtualizedScrollerRef = {
   updateCache: UpdateCache;
 };
 
-const DEFAULT_OVERSCAN_ROW_COUNT = 30;
+const DEFAULT_OVERSCAN_ROW_COUNT = 10;
 
 const EasyVirtualizedScroller = forwardRef<EasyVirtualizedScrollerRef, React.PropsWithChildren<Props>>((props, ref) => {
   const {
@@ -28,6 +29,7 @@ const EasyVirtualizedScroller = forwardRef<EasyVirtualizedScrollerRef, React.Pro
     overscanRowCount = DEFAULT_OVERSCAN_ROW_COUNT,
     children,
     hasMore,
+    scrollReverse,
     onLoadMore,
     loader
   } = props;
@@ -43,13 +45,21 @@ const EasyVirtualizedScroller = forwardRef<EasyVirtualizedScrollerRef, React.Pro
       ? {
           onLoadMore,
           hasMore,
+          scrollReverse,
           loader
         }
       : undefined
   );
   const parentScrollElement = useParentScrollElement(useParentScrollElementOption ? wrapperRef : undefined);
 
-  useImperativeHandle(ref, () => ({ updateCache }), [updateCache]);
+  useImperativeHandle(ref, () => ({
+    updateCache({ index, key }) {
+      updateCache({
+        index,
+        key: key && `.$${key}` // Add React children key prefix ".$"
+      });
+    }
+  }), [updateCache]);
 
   return (
     <div ref={wrapperRef}>
@@ -70,6 +80,7 @@ const EasyVirtualizedScroller = forwardRef<EasyVirtualizedScrollerRef, React.Pro
                   height={height}
                   overscanRowCount={overscanRowCount}
                   autoHeight
+                  scrollToIndex={scrollReverse ? renderElements.length : undefined}
                 />
               ))
             }

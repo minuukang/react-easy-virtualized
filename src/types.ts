@@ -5,6 +5,7 @@ export type RenderElement = { component: ReactElement; key: Key };
 export type InfiniteScrollOption = {
   onLoadMore: () => Promise<void>;
   hasMore: boolean;
+  scrollReverse?: boolean;
   loader?: React.ReactElement;
 };
 export type OnRowRendered = NonNullable<ListProps['onRowsRendered']>;
