@@ -1,5 +1,4 @@
 import { DependencyList, useCallback, useEffect, useRef } from 'react';
-import ResizeObserver from 'resize-observer-polyfill';
 
 import { getRootNode } from './domHelper';
 

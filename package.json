@@ -2,7 +2,7 @@
   "name": "react-easy-virtualized",
   "version": "0.0.1",
   "description": "easy to use react-virtualized package",
-  "main": "dist/index.js",
+  "main": "dist/esm.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "rm -rf dist && rollup -c",
@@ -14,8 +14,7 @@
   "author": "Minwoo Kang",
   "license": "ISC",
   "dependencies": {
-    "react-virtualized": "^9.22.3",
-    "resize-observer-polyfill": "^1.5.1"
+    "react-virtualized": "^9.22.3"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^18.0.0",

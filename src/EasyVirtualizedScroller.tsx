@@ -16,13 +16,13 @@ type Props = {
   loader?: React.ReactElement;
 };
 
-export type VirtualizedScrollerRef = {
+export type EasyVirtualizedScrollerRef = {
   updateCache: UpdateCache;
 };
 
 const DEFAULT_OVERSCAN_ROW_COUNT = 30;
 
-const EasyVirtualizedScroller = forwardRef<VirtualizedScrollerRef, React.PropsWithChildren<Props>>((props, ref) => {
+const EasyVirtualizedScroller = forwardRef<EasyVirtualizedScrollerRef, React.PropsWithChildren<Props>>((props, ref) => {
   const {
     useParentScrollElement: useParentScrollElementOption,
     overscanRowCount = DEFAULT_OVERSCAN_ROW_COUNT,
