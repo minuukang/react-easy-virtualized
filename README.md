@@ -10,7 +10,7 @@ npm i react-easy-virtualized --save
 
 Manually use of `react-virtualized` package example.
 
-```ts
+```tsx
 import { AutoSizer, List, WindowScroller, InfiniteScroll, CellMeasurerCache, ListRowRenderer, CellMeasurer } from 'react-virtualized';
 
 const cache = new CellMeasurerCache();
@@ -83,7 +83,7 @@ function App ({ data, loadMore, hasMore }: Props) {
 
 ... it's to long and hard to understanding rendering. try to use `react-easy-virtualized` !
 
-```ts
+```tsx
 import EasyVirtualized from 'react-easy-virtualized';
 
 type Props = {
@@ -130,7 +130,7 @@ type Props = {
 * If resize it item and removed from overscan area, will be automatically update cache when stop scroll 3 seconds
 * If you want to manually control cache, pass to ref to `EasyVirtualized` and using `updateCache()`
 
-```ts
+```tsx
 import { useRef, Key } from 'react';
 import EasyVirtualized, { EasyVirtualizedScrollerRef } from 'react-easy-virtualized';
 
