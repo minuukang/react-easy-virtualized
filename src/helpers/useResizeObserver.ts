@@ -10,7 +10,7 @@ export default function useResizeObserver(
   const observeElementsRef = useRef<Array<{ element: Element }>>([]);
 
   useEffect(() => {
-    observerRef.current = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+    observerRef.current = new ResizeObserver(entries => {
       const isNotInitialEntries = entries.filter(entry => {
         // Check removed
         return getRootNode(entry.target) === document;
