@@ -127,7 +127,7 @@ type Props = {
 ```
 
 * Automatically update cache when prepended item, deleted item, resize item dom
-* If resize it item and removed from overscan area, will be automatically update cache when stop scroll 3 seconds
+* If resize item is outside from overscan area, will be automatically update cache when stop scroll after 3 seconds
 * If you want to manually control cache, pass to ref to `EasyVirtualized` and using `updateCache()`
 
 ```tsx
