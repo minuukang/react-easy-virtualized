@@ -1,0 +1,13 @@
+.npm
+.npmignore
+.vscode
+
+*.log
+*.json
+
+*/**/__test__
+
+.cache
+node_modules
+src
+package-lock.json
