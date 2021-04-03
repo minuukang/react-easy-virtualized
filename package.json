@@ -13,6 +13,10 @@
   ],
   "author": "Minwoo Kang",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/minuukang/react-easy-virtualized"
+  },
   "dependencies": {
     "react-virtualized": "^9.22.3"
   },
