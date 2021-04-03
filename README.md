@@ -11,7 +11,7 @@ npm i react-easy-virtualized --save
 Manually use of `react-virtualized` package example.
 
 ```tsx
-import { AutoSizer, List, WindowScroller, InfiniteScroll, CellMeasurerCache, ListRowRenderer, CellMeasurer } from 'react-virtualized';
+import { AutoSizer, List, WindowScroller, InfiniteLoader, CellMeasurerCache, ListRowRenderer, CellMeasurer } from 'react-virtualized';
 
 const cache = new CellMeasurerCache();
 
@@ -51,7 +51,7 @@ function App ({ data, loadMore, hasMore }: Props) {
       {({ height, isScrolling, onChildScroll, scrollTop }) => (
         <AutoSizer disableHeight>
           {({ width }) =>
-            <InfiniteScroller
+            <InfiniteLoader
               loadMoreRows={loadMore}
               isRowLoaded={isRowLoaded}
               rowCount={rowCount}
@@ -72,7 +72,7 @@ function App ({ data, loadMore, hasMore }: Props) {
                   autoHeight
                 />
               )
-            </InfiniteScroller>
+            </InfiniteLoader>
           }
         </AutoSizer>
       )}
