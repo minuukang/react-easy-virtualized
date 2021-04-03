@@ -1,0 +1,36 @@
+{
+  "name": "react-easy-virtualized",
+  "version": "0.0.1",
+  "description": "easy to use react-virtualized package",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rm -rf dist && rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-virtualized"
+  ],
+  "author": "Minwoo Kang",
+  "license": "ISC",
+  "dependencies": {
+    "react-virtualized": "^9.22.3",
+    "resize-observer-polyfill": "^1.5.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^18.0.0",
+    "@rollup/plugin-node-resolve": "^11.2.1",
+    "@types/react": "^17.0.3",
+    "@types/react-virtualized": "^9.21.11",
+    "rollup": "^2.44.0",
+    "rollup-plugin-dts": "^3.0.1",
+    "rollup-plugin-jsx": "^1.0.3",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "typescript": "^4.2.3"
+  },
+  "peerDependencies": {
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  }
+}
