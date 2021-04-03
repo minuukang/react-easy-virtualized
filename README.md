@@ -1,6 +1,6 @@
 # react-easy-virtualized
 
-This package is easy way to use [react-virtualized]([react-virtualized](https://github.com/bvaughn/react-virtualized)) (built in `WindowScroller`, `AutoSizer`, `List` and optional of `InfniteScroll`). and use `ResizeObserver` to automatically update cache of `CellMeasurerCache`. (If you want to support IE, please add `ResizeObserver` polyfill)
+This package is easy way to use [react-virtualized](https://github.com/bvaughn/react-virtualized) (built in `WindowScroller`, `AutoSizer`, `List` and optional of `InfniteScroll`). and use `ResizeObserver` to automatically update cache of `CellMeasurerCache`. (If you want to support IE, please add `ResizeObserver` polyfill)
 
 ```bash
 npm i react-easy-virtualized --save
@@ -10,8 +10,8 @@ npm i react-easy-virtualized --save
 
 Manually use of `react-virtualized` package example.
 
-```ts
-import { AutoSizer, List, WindowScroller, InfiniteScroll, CellMeasurerCache, ListRowRenderer, CellMeasurer } from 'react-virtualized';
+```tsx
+import { AutoSizer, List, WindowScroller, InfiniteLoader, CellMeasurerCache, ListRowRenderer, CellMeasurer } from 'react-virtualized';
 
 const cache = new CellMeasurerCache();
 
@@ -51,7 +51,7 @@ function App ({ data, loadMore, hasMore }: Props) {
       {({ height, isScrolling, onChildScroll, scrollTop }) => (
         <AutoSizer disableHeight>
           {({ width }) =>
-            <InfiniteScroller
+            <InfiniteLoader
               loadMoreRows={loadMore}
               isRowLoaded={isRowLoaded}
               rowCount={rowCount}
@@ -72,7 +72,7 @@ function App ({ data, loadMore, hasMore }: Props) {
                   autoHeight
                 />
               )
-            </InfiniteScroller>
+            </InfiniteLoader>
           }
         </AutoSizer>
       )}
@@ -83,7 +83,7 @@ function App ({ data, loadMore, hasMore }: Props) {
 
 ... it's to long and hard to understanding rendering. try to use `react-easy-virtualized` !
 
-```ts
+```tsx
 import EasyVirtualized from 'react-easy-virtualized';
 
 type Props = {
@@ -130,7 +130,7 @@ type Props = {
 * If resize it item and removed from overscan area, will be automatically update cache when stop scroll 3 seconds
 * If you want to manually control cache, pass to ref to `EasyVirtualized` and using `updateCache()`
 
-```ts
+```tsx
 import { useRef, Key } from 'react';
 import EasyVirtualized, { EasyVirtualizedScrollerRef } from 'react-easy-virtualized';
 
