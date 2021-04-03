@@ -2,6 +2,10 @@
 
 This package is easy way to use [react-virtualized]([react-virtualized](https://github.com/bvaughn/react-virtualized)) (built in `WindowScroller`, `AutoSizer`, `List` and optional of `InfniteScroll`). and use `ResizeObserver` to automatically update cache of `CellMeasurerCache`. (If you want to support IE, please add `ResizeObserver` polyfill)
 
+```bash
+npm i react-easy-virtualized --save
+```
+
 ## Comparison of react-virtualized
 
 Manually use of `react-virtualized` package example.
