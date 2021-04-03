@@ -31,7 +31,7 @@ export default function useResizeObserver(
   }, deps);
   return {
     observe: useCallback((element: Element) => {
-      observerRef?.current?.observe(element);
+      observerRef.current?.observe(element);
       observeElementsRef.current.push({
         element
       });

@@ -13,10 +13,10 @@ type CacheProps = {
 export default function useCache(props: CacheProps) {
   const { renderElements, recomputedGridSize } = props;
   const cacheRef = useRefCallback(() => new CellMeasurerCache({ fixedWidth: true }));
-  const keyToIndexRef = useRef<Array<{ key: React.Key; index: number }>>([]);
 
   // Update render key
-  const updateRenderKey = JSON.stringify(renderElements.map(({ key }) => key));
+  const updateRenderKey = renderElements.map(({ key }) => key);
+  const beforeUpdateRenderKeyRef = useRef<React.Key[]>();
 
   const updateCache: UpdateCache = useCallback(
     ({ key, index }) => {
@@ -30,41 +30,41 @@ export default function useCache(props: CacheProps) {
       recomputedGridSize();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [updateRenderKey, recomputedGridSize]
+    [JSON.stringify(updateRenderKey), recomputedGridSize]
   );
 
   // When render elements update sort or deleted
   // recalculate cache
   useLayoutEffect(() => {
     const caches = cacheRef.current;
-    if (keyToIndexRef.current.length) {
-      const reCaculators: Array<{ index: number; target: number; width: number; height: number }> = [];
-      keyToIndexRef.current.forEach(element => {
-        const currentIndex = renderElements.findIndex(({ key }) => key === element.key);
+    if (beforeUpdateRenderKeyRef.current) {
+      const reCaculators: Array<{ from: number; to: number; width: number; height: number }> = [];
+      beforeUpdateRenderKeyRef.current.forEach((key, prevIndex) => {
+        const currentIndex = renderElements.findIndex(element => key === element.key);
         // When the element is deleted
         if (currentIndex === -1) {
-          caches.clear(element.index, 0);
+          caches.clear(prevIndex, 0);
         }
         // When the element is sorted
-        else if (currentIndex !== element.index) {
+        else if (currentIndex !== prevIndex) {
           reCaculators.push({
-            index: element.index,
-            target: currentIndex,
-            width: caches.getWidth(element.index, 0),
-            height: caches.getHeight(element.index, 0)
+            from: prevIndex,
+            to: currentIndex,
+            width: caches.getWidth(prevIndex, 0),
+            height: caches.getHeight(prevIndex, 0)
           });
         }
       });
       if (reCaculators.length) {
-        reCaculators.forEach(({ index, target, width, height }) => {
-          caches.clear(index, 0);
-          caches.set(target, 0, width, height);
+        reCaculators.forEach(({ from, to, width, height }) => {
+          caches.clear(from, 0);
+          caches.set(to, 0, width, height);
         });
       }
       recomputedGridSize();
     }
     return () => {
-      keyToIndexRef.current = renderElements.map(({ key }, index) => ({ key, index }));
+      beforeUpdateRenderKeyRef.current = updateRenderKey;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateCache]);
