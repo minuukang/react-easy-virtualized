@@ -30,7 +30,7 @@ function App ({ data, loadMore, hasMore }: Props) {
 
   const rowRenderer: ListRowRenderer = params => {
     const item = isRowLoaded(params)
-      ? <DataComponent data={data[param.id]} />
+      ? <DataComponent data={data[params.index]} />
       : <div>Loading...</div>;
     return (
       <CellMeasurer
