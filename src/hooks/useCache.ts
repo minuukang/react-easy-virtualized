@@ -38,8 +38,12 @@ export default function useCache(props: CacheProps) {
   useLayoutEffect(() => {
     const caches = cacheRef.current;
     if (beforeUpdateRenderKeyRef.current) {
-      const reCaculators: Array<{ from: number; to: number; width: number; height: number }> = [];
-      beforeUpdateRenderKeyRef.current.forEach((key, prevIndex) => {
+      beforeUpdateRenderKeyRef.current.reduce<{
+        from: number;
+        to: number;
+        width: number;
+        height: number;
+      }[]>((result, key, prevIndex) => {
         const currentIndex = renderElements.findIndex(element => key === element.key);
         // When the element is deleted
         if (currentIndex === -1) {
@@ -47,20 +51,18 @@ export default function useCache(props: CacheProps) {
         }
         // When the element is sorted
         else if (currentIndex !== prevIndex) {
-          reCaculators.push({
+          result.push({
             from: prevIndex,
             to: currentIndex,
             width: caches.getWidth(prevIndex, 0),
             height: caches.getHeight(prevIndex, 0)
           });
         }
+        return result;
+      }, []).forEach(({ from, to, width, height }) => {
+        caches.clear(from, 0);
+        caches.set(to, 0, width, height);
       });
-      if (reCaculators.length) {
-        reCaculators.forEach(({ from, to, width, height }) => {
-          caches.clear(from, 0);
-          caches.set(to, 0, width, height);
-        });
-      }
       recomputedGridSize();
     }
     return () => {
