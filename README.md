@@ -1,6 +1,6 @@
 # react-easy-virtualized
 
-This package is easy way to use [react-virtualized](https://github.com/bvaughn/react-virtualized) (built in `WindowScroller`, `AutoSizer`, `List` and optional of `InfniteScroll`). and use `ResizeObserver` to automatically update cache of `CellMeasurerCache`. (If you want to support IE, please add `ResizeObserver` polyfill)
+This package is easy way to use [react-virtualized](https://github.com/bvaughn/react-virtualized) (built in `WindowScroller`, `AutoSizer`, `List` and optional of `InfiniteLoader`). and use `ResizeObserver` to automatically update cache of `CellMeasurerCache`. (If you want to support IE, please add `ResizeObserver` polyfill)
 
 ```bash
 npm i react-easy-virtualized --save
@@ -127,7 +127,7 @@ type Props = {
 ```
 
 * Automatically update cache when prepended item, deleted item, resize item dom
-* If resize it item and removed from overscan area, will be automatically update cache when stop scroll 3 seconds
+* If resize item is outside from overscan area, will be automatically update cache when stop scroll after 3 seconds
 * If you want to manually control cache, pass to ref to `EasyVirtualized` and using `updateCache()`
 
 ```tsx
