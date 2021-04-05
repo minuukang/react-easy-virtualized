@@ -3,15 +3,16 @@ import { CellMeasurerCache } from 'react-virtualized/dist/es/CellMeasurer';
 
 import useRefCallback from '../helpers/useRefCallback';
 
-import { RenderElement, UpdateCache } from '../types';
+import { InfiniteScrollOption, RenderElement, UpdateCache } from '../types';
 
 type CacheProps = {
   renderElements: RenderElement[];
+  infiniteScrollOption?: InfiniteScrollOption;
   recomputedGridSize(): void;
 };
 
 export default function useCache(props: CacheProps) {
-  const { renderElements, recomputedGridSize } = props;
+  const { renderElements, recomputedGridSize, infiniteScrollOption } = props;
   const cacheRef = useRefCallback(() => new CellMeasurerCache({ fixedWidth: true }));
 
   // Update render key
@@ -38,6 +39,10 @@ export default function useCache(props: CacheProps) {
   useLayoutEffect(() => {
     const caches = cacheRef.current;
     if (beforeUpdateRenderKeyRef.current) {
+      // If using infinite loader, delete cache of loading
+      if (infiniteScrollOption) {
+        caches.clear(infiniteScrollOption.scrollReverse ? 0 : beforeUpdateRenderKeyRef.current.length, 0);
+      }
       beforeUpdateRenderKeyRef.current.reduce<{
         from: number;
         to: number;

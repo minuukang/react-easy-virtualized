@@ -2,6 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import { List } from 'react-virtualized/dist/es/List';
 
 import useRepaintCallback from '../helpers/useRepaintCallback';
+import useAsyncLoading from '../helpers/useAsyncLoading';
 
 import useRender from './useRender';
 import useCache from './useCache';
@@ -18,6 +19,7 @@ export default function useEasyVirtualizedScroller(
 ) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<List>();
+  const [, requestLoadingProcesser] = useAsyncLoading();
 
   const handleRegisterList = useCallback((list: List) => {
     listRef.current = list;
@@ -34,19 +36,25 @@ export default function useEasyVirtualizedScroller(
     listRef.current?.recomputeGridSize();
   }, [listRef]);
 
-  const { updateCache, cacheRef } = useCache({ renderElements, recomputedGridSize });
+  const { updateCache, cacheRef } = useCache({
+    renderElements,
+    recomputedGridSize,
+    infiniteScrollOption
+  });
   const { handleAutoUpdateGrid, handleRowsRendered } = useLayout({
     renderElements,
     getElementByKey,
     updateCache,
+    requestLoadingProcesser,
     autoUpdateGridTime: AUTO_UPDATE_GRID_TIME
   });
   const { renderListWrapper } = useRender({
     renderElements,
     cacheRef,
     infiniteScrollOption,
+    requestLoadingProcesser,
     onRegisterList: handleRegisterList,
-    onRowsRendered: handleRowsRendered
+    onRowsRendered: handleRowsRendered,
   });
 
   return {

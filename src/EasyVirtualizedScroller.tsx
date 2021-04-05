@@ -6,15 +6,11 @@ import { WindowScroller } from 'react-virtualized/dist/es/WindowScroller';
 import useParentScrollElement from './helpers/useParentScrollElement';
 
 import useEasyVirtualizedScroller from './hooks/useEasyVirtualizedScroller';
-import { RenderElement, UpdateCache } from './types';
+import { InfiniteScrollOption, RenderElement, UpdateCache } from './types';
 
-type Props = {
+type Props = Partial<InfiniteScrollOption> & {
   useParentScrollElement?: boolean;
   overscanRowCount?: number;
-  onLoadMore?: () => Promise<void>;
-  scrollReverse?: boolean;
-  hasMore?: boolean;
-  loader?: React.ReactElement;
 };
 
 export type EasyVirtualizedScrollerRef = {
@@ -28,10 +24,7 @@ const EasyVirtualizedScroller = forwardRef<EasyVirtualizedScrollerRef, React.Pro
     useParentScrollElement: useParentScrollElementOption,
     overscanRowCount = DEFAULT_OVERSCAN_ROW_COUNT,
     children,
-    hasMore,
-    scrollReverse,
-    onLoadMore,
-    loader
+    ...infiniteScrollOption
   } = props;
   const renderElements: RenderElement[] = React.Children.toArray(children)
     .filter((component): component is React.ReactElement => !!(component as React.ReactElement).key)
@@ -41,13 +34,8 @@ const EasyVirtualizedScroller = forwardRef<EasyVirtualizedScrollerRef, React.Pro
     }));
   const { updateCache, renderListWrapper, wrapperRef, handleAutoUpdateGrid } = useEasyVirtualizedScroller(
     renderElements,
-    onLoadMore !== undefined && hasMore !== undefined
-      ? {
-          onLoadMore,
-          hasMore,
-          scrollReverse,
-          loader
-        }
+    infiniteScrollOption.onLoadMore !== undefined && infiniteScrollOption.hasMore !== undefined
+      ? infiniteScrollOption as InfiniteScrollOption
       : undefined
   );
   const parentScrollElement = useParentScrollElement(useParentScrollElementOption ? wrapperRef : undefined);
@@ -80,7 +68,7 @@ const EasyVirtualizedScroller = forwardRef<EasyVirtualizedScrollerRef, React.Pro
                   height={height}
                   overscanRowCount={overscanRowCount}
                   autoHeight
-                  scrollToIndex={scrollReverse ? renderElements.length : undefined}
+                  scrollToIndex={infiniteScrollOption.scrollReverse ? renderElements.length : undefined}
                 />
               ))
             }

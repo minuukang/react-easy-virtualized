@@ -11,6 +11,7 @@ type LayoutProps = {
   renderElements: RenderElement[];
   updateCache: UpdateCache;
   getElementByKey(key: RenderElement['key']): HTMLElement | null;
+  requestLoadingProcesser(callback: () => Promise<unknown>): Promise<unknown>;
   autoUpdateGridTime: number;
 };
 
@@ -22,7 +23,7 @@ function createRangeKeyArray(elements: RenderElement[], { start, end }: { start:
 }
 
 export default function useLayout(props: LayoutProps) {
-  const { renderElements, updateCache, getElementByKey, autoUpdateGridTime } = props;
+  const { renderElements, updateCache, getElementByKey, autoUpdateGridTime, requestLoadingProcesser } = props;
 
   const beforeScanKeysRef = useRef<RenderElement['key'][]>();
   const beforeOverScanKeysRef = useRef<RenderElement['key'][]>();
@@ -35,12 +36,20 @@ export default function useLayout(props: LayoutProps) {
   const handleAutoUpdateGrid = useRepaintCallback(() => {
     window.clearTimeout(updateGridTimerRef.current);
     updateGridTimerRef.current = window.setTimeout(() => {
-      [...mutationUpdateKeySetRef.current.values()].forEach(key => {
-        if (!beforeOverScanKeysRef.current?.includes(key)) {
-          updateCache({ key });
-          mutationUpdateKeySetRef.current.delete(key);
-        }
-      });
+      requestLoadingProcesser(
+        () =>
+          new Promise<void>(resolve =>
+            requestAnimationFrame(() => {
+              [...mutationUpdateKeySetRef.current.values()].forEach(key => {
+                if (!beforeOverScanKeysRef.current?.includes(key)) {
+                  updateCache({ key });
+                  mutationUpdateKeySetRef.current.delete(key);
+                }
+              });
+              resolve();
+            })
+          )
+      );
     }, autoUpdateGridTime);
   }, [updateCache, autoUpdateGridTime]);
 

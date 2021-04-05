@@ -3,7 +3,6 @@ import { List, ListProps, ListRowRenderer } from 'react-virtualized/dist/es/List
 import { CellMeasurer, CellMeasurerCache } from 'react-virtualized/dist/es/CellMeasurer';
 import { InfiniteLoader } from 'react-virtualized/dist/es/InfiniteLoader';
 
-import useAsyncLoading from '../helpers/useAsyncLoading';
 import { mergeFunc } from '../helpers/functionHelper';
 
 import { RenderElement, InfiniteScrollOption, OnRowRendered, OverscanIndicesGetter } from '../types';
@@ -13,6 +12,7 @@ type RenderProps = {
   cacheRef: React.MutableRefObject<CellMeasurerCache>;
   onRowsRendered: OnRowRendered;
   onRegisterList: (listEl: List) => void;
+  requestLoadingProcesser(callback: () => Promise<unknown>): Promise<unknown>;
   infiniteScrollOption?: InfiniteScrollOption;
 };
 
@@ -27,8 +27,7 @@ const handleOverscanIndicesGetter: OverscanIndicesGetter = ({
 });
 
 export default function useRender(props: RenderProps) {
-  const { renderElements, cacheRef, infiniteScrollOption, onRowsRendered, onRegisterList } = props;
-  const [, nextLoadingProcesser] = useAsyncLoading();
+  const { renderElements, cacheRef, infiniteScrollOption, onRowsRendered, onRegisterList, requestLoadingProcesser } = props;
   const rowCount = renderElements.length + (infiniteScrollOption?.hasMore ? 1 : 0);
 
   const handleIsRowLoaded = ({ index }: { index: number }) => {
@@ -76,7 +75,7 @@ export default function useRender(props: RenderProps) {
       return (
         <InfiniteLoader
           rowCount={rowCount}
-          loadMoreRows={() => nextLoadingProcesser(infiniteScrollOption.onLoadMore)}
+          loadMoreRows={() => requestLoadingProcesser(infiniteScrollOption.onLoadMore)}
           isRowLoaded={handleIsRowLoaded}
         >
           {({ registerChild, onRowsRendered: onInfiniteScrollRowRendered }) =>
