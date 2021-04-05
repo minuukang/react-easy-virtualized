@@ -1,6 +1,6 @@
 {
   "name": "react-easy-virtualized",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "easy to use react-virtualized package",
   "main": "dist/esm.js",
   "types": "dist/index.d.ts",

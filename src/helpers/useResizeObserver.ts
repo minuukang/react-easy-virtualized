@@ -8,12 +8,17 @@ export default function useResizeObserver(
 ) {
   const observerRef = useRef<ResizeObserver | undefined>();
   const observeElementsRef = useRef<Array<{ element: Element }>>([]);
+  const observeInitialSetRef = useRef<Set<Element>>();
 
   useEffect(() => {
+    observeInitialSetRef.current = new Set();
     observerRef.current = new ResizeObserver(entries => {
       const isNotInitialEntries = entries.filter(entry => {
-        // Check removed
-        return getRootNode(entry.target) === document;
+        // Check created or removed
+        return observeInitialSetRef.current?.has(entry.target) && getRootNode(entry.target) === document;
+      });
+      entries.forEach(entry => {
+        observeInitialSetRef.current?.add(entry.target);
       });
       if (isNotInitialEntries.length) {
         window.requestAnimationFrame(() => {

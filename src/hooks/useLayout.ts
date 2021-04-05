@@ -28,7 +28,6 @@ export default function useLayout(props: LayoutProps) {
   const beforeScanKeysRef = useRef<RenderElement['key'][]>();
   const beforeOverScanKeysRef = useRef<RenderElement['key'][]>();
 
-  const observeInitialKeySetRef = useRefCallback(() => new Set<RenderElement['key']>());
   const mutationUpdateKeySetRef = useRefCallback(() => new Set<RenderElement['key']>());
 
   const updateGridTimerRef = useRef<number>(0);
@@ -67,11 +66,7 @@ export default function useLayout(props: LayoutProps) {
         const key = itemWrapper.dataset.virtualizedKey;
         if (key) {
           updateCache({ key });
-          if (observeInitialKeySetRef.current.has(key)) {
-            mutationUpdateKeySetRef.current.add(key);
-          } else {
-            observeInitialKeySetRef.current.add(key);
-          }
+          mutationUpdateKeySetRef.current.add(key);
         }
       });
     },
