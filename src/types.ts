@@ -1,5 +1,5 @@
 import { ReactElement, Key } from 'react';
-import { ListProps } from 'react-virtualized/dist/es/List';
+import { GridProps } from 'react-virtualized/dist/es/Grid';
 
 export type RenderElement = { component: ReactElement; key: Key };
 export type InfiniteScrollOption = {
@@ -9,6 +9,6 @@ export type InfiniteScrollOption = {
   threshold?: number;
   loader?: React.ReactElement;
 };
-export type OnRowRendered = NonNullable<ListProps['onRowsRendered']>;
-export type OverscanIndicesGetter = NonNullable<ListProps['overscanIndicesGetter']>;
+export type OnSectionRendered = NonNullable<GridProps['onSectionRendered']>;
+export type OverscanIndicesGetter = NonNullable<GridProps['overscanIndicesGetter']>;
 export type UpdateCache = (options: { key?: Key; index?: number }) => void;

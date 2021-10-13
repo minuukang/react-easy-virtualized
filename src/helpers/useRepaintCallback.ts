@@ -1,15 +1,15 @@
-import { DependencyList, useRef, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 
 export default function useRepaintCallback<C extends (...args: never[]) => void>(
-  callback: C,
-  deps: DependencyList = []
+  callback: C
 ): C {
   const timerRef = useRef<number>(0);
+  const callbackRef = useRef<typeof callback>(callback);
+  callbackRef.current = callback;
   return useCallback((...args: never[]) => {
     window.cancelAnimationFrame(timerRef.current);
     timerRef.current = window.requestAnimationFrame(() => {
-      callback(...args);
+      callbackRef.current(...args);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps) as C;
+  }, []) as C;
 }

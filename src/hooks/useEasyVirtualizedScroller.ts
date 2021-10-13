@@ -1,66 +1,77 @@
-import React, { useCallback, useRef } from 'react';
-import { List } from 'react-virtualized/dist/es/List';
-
-import useRepaintCallback from '../helpers/useRepaintCallback';
-import useAsyncLoading from '../helpers/useAsyncLoading';
+import React, { useCallback, useReducer, useRef } from 'react';
+import { Grid } from 'react-virtualized/dist/es/Grid';
 
 import useRender from './useRender';
 import useCache from './useCache';
 import useLayout from './useLayout';
+
 import { InfiniteScrollOption } from '../types';
 
 type RenderElement = { component: React.ReactElement; key: React.Key };
 
 const AUTO_UPDATE_GRID_TIME = 3000;
 
-export default function useEasyVirtualizedScroller(
-  renderElements: RenderElement[],
-  infiniteScrollOption?: InfiniteScrollOption
-) {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<List>();
-  const [, requestLoadingProcesser] = useAsyncLoading();
+type Props = {
+  renderElements: RenderElement[];
+  columnCount: number;
+  infiniteScrollOption?: InfiniteScrollOption;
+};
 
-  const handleRegisterList = useCallback((list: List) => {
-    listRef.current = list;
+export default function useVirtualizedScroller(props: Props) {
+  const { renderElements, columnCount, infiniteScrollOption } = props;
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<Grid>();
+  const forceUpdate = useReducer(() => ({}), {})[1];
+
+  const handleRegisterGrid = useCallback((grid: Grid) => {
+    gridRef.current = grid;
   }, []);
 
   const getElementByKey = useCallback(
     (key: React.Key): HTMLElement | null => {
-      return (wrapperRef.current?.querySelector(`[data-virtualized-key="${key}"]`)?.children[0] as HTMLElement) || null;
+      return wrapperRef.current?.querySelector(`[data-virtualized-key="${key}"]`) || null;
     },
     [wrapperRef]
   );
 
-  const recomputedGridSize = useRepaintCallback(() => {
-    listRef.current?.recomputeGridSize();
-  }, [listRef]);
+  const recomputedGridSize = useCallback(
+    (params?: { columnIndex: number; rowIndex: number }) => {
+      if (params && gridRef.current) {
+        gridRef.current.recomputeGridSize(params);
+      } else {
+        forceUpdate();
+      }
+    },
+    [forceUpdate]
+  );
 
-  const { updateCache, cacheRef } = useCache({
+  const { updateCache, cache } = useCache({
+    columnCount,
     renderElements,
     recomputedGridSize,
     infiniteScrollOption
   });
-  const { handleAutoUpdateGrid, handleRowsRendered } = useLayout({
+  const { handleAutoUpdateGrid, handleSectionRendered } = useLayout({
+    columnCount,
     renderElements,
     getElementByKey,
     updateCache,
-    requestLoadingProcesser,
     autoUpdateGridTime: AUTO_UPDATE_GRID_TIME
   });
-  const { renderListWrapper } = useRender({
+  const { renderGridWrapper, isProcessing } = useRender({
     renderElements,
-    cacheRef,
+    cache,
     infiniteScrollOption,
-    requestLoadingProcesser,
-    onRegisterList: handleRegisterList,
-    onRowsRendered: handleRowsRendered,
+    columnCount,
+    onRegisterGrid: handleRegisterGrid,
+    onSectionRendered: handleSectionRendered
   });
 
   return {
     updateCache,
     wrapperRef,
     handleAutoUpdateGrid,
-    renderListWrapper
+    renderGridWrapper,
+    isProcessing
   };
 }

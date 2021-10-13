@@ -3,15 +3,15 @@ import { useRef } from 'react';
 import useRefCallback from '../helpers/useRefCallback';
 import useRepaintCallback from '../helpers/useRepaintCallback';
 import useResizeObserver from '../helpers/useResizeObserver';
-import { closest, nodeIsElement } from '../helpers/domHelper';
+import { closest, getRootNode, nodeIsElement } from '../helpers/domHelper';
 
-import { OnRowRendered, RenderElement, UpdateCache } from '../types';
+import { OnSectionRendered, RenderElement, UpdateCache } from '../types';
 
 type LayoutProps = {
+  columnCount: number;
   renderElements: RenderElement[];
   updateCache: UpdateCache;
   getElementByKey(key: RenderElement['key']): HTMLElement | null;
-  requestLoadingProcesser(callback: () => Promise<unknown>): Promise<unknown>;
   autoUpdateGridTime: number;
 };
 
@@ -23,7 +23,7 @@ function createRangeKeyArray(elements: RenderElement[], { start, end }: { start:
 }
 
 export default function useLayout(props: LayoutProps) {
-  const { renderElements, updateCache, getElementByKey, autoUpdateGridTime, requestLoadingProcesser } = props;
+  const { renderElements, updateCache, getElementByKey, autoUpdateGridTime, columnCount } = props;
 
   const beforeScanKeysRef = useRef<RenderElement['key'][]>();
   const beforeOverScanKeysRef = useRef<RenderElement['key'][]>();
@@ -34,50 +34,52 @@ export default function useLayout(props: LayoutProps) {
 
   const handleAutoUpdateGrid = useRepaintCallback(() => {
     window.clearTimeout(updateGridTimerRef.current);
+    if (!mutationUpdateKeySetRef.current.size) {
+      return;
+    }
     updateGridTimerRef.current = window.setTimeout(() => {
-      requestLoadingProcesser(
-        () =>
-          new Promise<void>(resolve =>
-            requestAnimationFrame(() => {
-              [...mutationUpdateKeySetRef.current.values()].forEach(key => {
-                if (!beforeOverScanKeysRef.current?.includes(key)) {
-                  updateCache({ key });
-                  mutationUpdateKeySetRef.current.delete(key);
-                }
-              });
-              resolve();
-            })
-          )
-      );
+      requestAnimationFrame(() => {
+        [...mutationUpdateKeySetRef.current.values()].forEach(key => {
+          if (!beforeOverScanKeysRef.current?.includes(key)) {
+            if (renderElements.some(el => el.key === key)) {
+              updateCache({ key });
+            } else {
+              mutationUpdateKeySetRef.current.delete(key);
+            }
+          }
+        });
+      });
     }, autoUpdateGridTime);
-  }, [updateCache, autoUpdateGridTime]);
+  });
 
   const updateObserver = useResizeObserver(
     entiries => {
-      Array.from(
-        new Set(
-          entiries
-            .map(entry => entry.target)
-            .filter(nodeIsElement)
-            .map(target => closest(target, '[data-virtualized-key]'))
-            .filter(nodeIsElement)
-        )
-      ).forEach(itemWrapper => {
-        const key = itemWrapper.dataset.virtualizedKey;
-        if (key) {
-          updateCache({ key });
-          mutationUpdateKeySetRef.current.add(key);
-        }
-      });
-    },
-    [updateCache]
+      window.requestAnimationFrame(() => {
+        Array.from(
+          new Set(
+            entiries
+              .map(entry => entry.target)
+              .filter(nodeIsElement)
+              .filter(target => getRootNode(target) === document)
+              .map(target => closest(target, '[data-virtualized-key]'))
+              .filter(nodeIsElement)
+          )
+        ).forEach(itemWrapper => {
+          const key = itemWrapper.dataset.virtualizedKey;
+          if (key) {
+            updateCache({ key });
+            mutationUpdateKeySetRef.current.add(key);
+          }
+        });
+      })
+    }
   );
 
-  const handleRowsRendered: OnRowRendered = useRepaintCallback(
+  const handleSectionRendered: OnSectionRendered = useRepaintCallback(
     info => {
       const scanKeys = createRangeKeyArray(renderElements, {
-        start: info.startIndex,
-        end: info.stopIndex
+        start: info.rowStartIndex * columnCount + info.columnStartIndex,
+        end: info.rowStopIndex * columnCount + info.columnStopIndex
       });
       [...new Set([...scanKeys, ...(beforeScanKeysRef.current || [])])].forEach(key => {
         const isInBeforeScanKey = !!beforeScanKeysRef.current?.includes(key);
@@ -85,21 +87,22 @@ export default function useLayout(props: LayoutProps) {
         if (!beforeScanKeysRef.current || !isInBeforeScanKey) {
           const targetElement = getElementByKey(key);
           if (targetElement) {
-            updateObserver.observe(targetElement);
+            [...targetElement.children].forEach(element => {
+              updateObserver.observe(element);
+            });
           }
         }
       });
       beforeScanKeysRef.current = scanKeys;
       beforeOverScanKeysRef.current = createRangeKeyArray(renderElements, {
-        start: info.overscanStartIndex,
-        end: info.overscanStopIndex
+        start: info.rowOverscanStartIndex * columnCount + info.columnOverscanStartIndex,
+        end: info.rowOverscanStopIndex * columnCount + info.columnOverscanStopIndex
       });
-    },
-    [updateCache, getElementByKey]
+    }
   );
 
   return {
-    handleRowsRendered,
+    handleSectionRendered,
     handleAutoUpdateGrid
   };
 }
