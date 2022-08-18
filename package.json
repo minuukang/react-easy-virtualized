@@ -1,9 +1,12 @@
 {
   "name": "react-easy-virtualized",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "easy to use react-virtualized package",
-  "main": "dist/esm.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    "require": "./dist/cjs.js",
+    "import": "./dist/esm.js"
+  },
   "scripts": {
     "build": "rm -rf dist && rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
