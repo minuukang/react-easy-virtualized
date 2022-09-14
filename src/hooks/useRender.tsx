@@ -32,12 +32,12 @@ const LOADER_KEY = `loader__${Math.random()}`;
 
 export default function useRender(props: RenderProps) {
   const { renderElements, cache, infiniteScrollOption, onSectionRendered, onRegisterGrid, columnCount } = props;
-  const { onLoadMore, hasMore, loader, threshold } = infiniteScrollOption || {};
+  const { onLoadMore, hasMore, loader, threshold, initialLoad } = infiniteScrollOption || {};
   const loaderVisibleRef = useRef(false);
   const loadMoreTimerRef = useRef(0);
 
   const rowCount = Math.ceil(renderElements.length / columnCount);
-  const infiniteRowCount = rowCount + (infiniteScrollOption?.hasMore ? 1 : 0);
+  const infiniteRowCount = rowCount + (hasMore ? 1 : 0);
 
   const handleIsRowLoaded = ({ index }: { index: number }) => {
     return !hasMore || index < rowCount;
@@ -64,11 +64,13 @@ export default function useRender(props: RenderProps) {
   );
 
   useEffect(() => {
-    void handleLoadMore();
+    if (initialLoad) {
+      void handleLoadMore();
+    }
     return () => {
       window.cancelAnimationFrame(loadMoreTimerRef.current);
     };
-  }, [handleLoadMore]);
+  }, [initialLoad, handleLoadMore]);
 
   const renderCell: GridCellRenderer = params => {
     const index = params.rowIndex * columnCount + params.columnIndex;

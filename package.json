@@ -1,6 +1,6 @@
 {
   "name": "react-easy-virtualized",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "easy to use react-virtualized package",
   "types": "dist/index.d.ts",
   "exports": {

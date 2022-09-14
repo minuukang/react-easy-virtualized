@@ -8,6 +8,7 @@ export type InfiniteScrollOption = {
   scrollReverse?: boolean;
   threshold?: number;
   loader?: React.ReactElement;
+  initialLoad?: boolean;
 };
 export type OnSectionRendered = NonNullable<GridProps['onSectionRendered']>;
 export type OverscanIndicesGetter = NonNullable<GridProps['overscanIndicesGetter']>;
